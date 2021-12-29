@@ -1,0 +1,121 @@
+[I 2021-12-27 21:23:41.370 JupyterHub dockerspawner:1272] Created container jupyter-tstreibl-dash-2dtest-2ddashboard (id: e773946) from image jupyterlab_img
+[I 2021-12-27 21:23:41.370 JupyterHub dockerspawner:1296] Starting container jupyter-tstreibl-dash-2dtest-2ddashboard (id: e773946)
+[I 2021-12-27 21:23:41.437 JupyterHub log:189] 200 GET /hub/dashboards/test-dashboard (tstreibl@::ffff:46.128.245.7) 25.37ms
+[D 2021-12-27 21:23:41.661 JupyterHub log:189] 304 GET /hub/dashboards-static/css/style.css (@::ffff:46.128.245.7) 1.30ms
+[D 2021-12-27 21:23:41.810 JupyterHub log:189] 200 GET /hub/dashboards-static/js/viewdashboard.js?v=20211227212041 (@::ffff:46.128.245.7) 2.53ms
+[D 2021-12-27 21:23:42.011 JupyterHub spawner:1221] Polling subprocess every 30s
+[D 2021-12-27 21:23:51.266 JupyterHub dockerspawner:982] Getting container 'jupyter-tstreibl-dash-2dtest-2ddashboard'
+[D 2021-12-27 21:23:51.272 JupyterHub dockerspawner:967] Container e773946 status: {'Dead': False,
+     'Error': '',
+     'ExitCode': 1,
+     'FinishedAt': '2021-12-27T20:23:42.0838958Z',
+     'OOMKilled': False,
+     'Paused': False,
+     'Pid': 0,
+     'Restarting': False,
+     'Running': False,
+     'StartedAt': '2021-12-27T20:23:41.995181933Z',
+     'Status': 'exited'}
+[D 2021-12-27 21:23:51.273 JupyterHub base:226] In do_final_build
+[W 2021-12-27 21:23:51.273 JupyterHub web:1787] 500 GET /hub/dashboards-api/test-dashboard/progress (::ffff:46.128.245.7): Spawner failed to start [status=ExitCode=1, Error='', FinishedAt=2021-12-27T20:23:42.0838958Z]. The logs for tstreibl:dash-test-dashboard may contain details.
+[E 2021-12-27 21:23:51.274 JupyterHub web:1197] Cannot send error response after headers written
+[I 2021-12-27 21:23:51.275 JupyterHub log:189] 200 GET /hub/dashboards-api/test-dashboard/progress (tstreibl@::ffff:46.128.245.7) 9393.61ms
+[I 2021-12-27 21:23:56.422 JupyterHub log:189] 200 GET /hub/dashboards-api/test-dashboard/progress (tstreibl@::ffff:46.128.245.7) 10.12ms
+[D 2021-12-27 21:24:07.639 JupyterHub dockerspawner:982] Getting container 'jupyter-tstreibl-'
+[D 2021-12-27 21:24:07.661 JupyterHub dockerspawner:967] Container a840df8 status: {'Dead': False,
+     'Error': '',
+     'ExitCode': 0,
+     'FinishedAt': '0001-01-01T00:00:00Z',
+     'OOMKilled': False,
+     'Paused': False,
+     'Pid': 197417,
+     'Restarting': False,
+     'Running': True,
+     'StartedAt': '2021-12-27T20:21:37.61964646Z',
+     'Status': 'running'}
+[D 2021-12-27 21:24:12.015 JupyterHub dockerspawner:982] Getting container 'jupyter-tstreibl-dash-2dtest-2ddashboard'
+[D 2021-12-27 21:24:12.021 JupyterHub dockerspawner:967] Container e773946 status: {'Dead': False,
+     'Error': '',
+     'ExitCode': 1,
+     'FinishedAt': '2021-12-27T20:23:42.0838958Z',
+     'OOMKilled': False,
+     'Paused': False,
+     'Pid': 0,
+     'Restarting': False,
+     'Running': False,
+     'StartedAt': '2021-12-27T20:23:41.995181933Z',
+     'Status': 'exited'}
+[W 2021-12-27 21:24:22.376 JupyterHub user:811] tstreibl's server never showed up at http://192.168.144.4:8888/user/tstreibl/dash-test-dashboard/ after 30 seconds. Giving up.
+    
+    Common causes of this timeout, and debugging tips:
+    
+    1. The server didn't finish starting,
+       or it crashed due to a configuration issue.
+       Check the single-user server's logs for hints at what needs fixing.
+    2. The server started, but is not accessible at the specified URL.
+       This may be a configuration issue specific to your chosen Spawner.
+       Check the single-user server logs and resource to make sure the URL
+       is correct and accessible from the Hub.
+    3. (unlikely) Everything is working, but the server took too long to respond.
+       To fix: increase `Spawner.http_timeout` configuration
+       to a number of seconds that is enough for servers to become responsive.
+    
+[D 2021-12-27 21:24:22.377 JupyterHub user:860] Stopping tstreibl:dash-test-dashboard
+[D 2021-12-27 21:24:22.377 JupyterHub dockerspawner:982] Getting container 'jupyter-tstreibl-dash-2dtest-2ddashboard'
+[D 2021-12-27 21:24:22.384 JupyterHub dockerspawner:967] Container e773946 status: {'Dead': False,
+     'Error': '',
+     'ExitCode': 1,
+     'FinishedAt': '2021-12-27T20:23:42.0838958Z',
+     'OOMKilled': False,
+     'Paused': False,
+     'Pid': 0,
+     'Restarting': False,
+     'Running': False,
+     'StartedAt': '2021-12-27T20:23:41.995181933Z',
+     'Status': 'exited'}
+[D 2021-12-27 21:24:22.401 JupyterHub user:883] Finished stopping tstreibl:dash-test-dashboard
+[E 2021-12-27 21:24:22.409 JupyterHub gen:623] Exception in Future <Task finished name='Task-136' coro=<BaseHandler.spawn_single_user.<locals>.finish_user_spawn() done, defined at /usr/local/lib/python3.8/dist-packages/jupyterhub/handlers/base.py:935> exception=TimeoutError("Server at http://192.168.144.4:8888/user/tstreibl/dash-test-dashboard/ didn't respond in 30 seconds")> after timeout
+    Traceback (most recent call last):
+      File "/usr/local/lib/python3.8/dist-packages/tornado/gen.py", line 618, in error_callback
+        future.result()
+      File "/usr/local/lib/python3.8/dist-packages/jupyterhub/handlers/base.py", line 942, in finish_user_spawn
+        await spawn_future
+      File "/usr/local/lib/python3.8/dist-packages/jupyterhub/user.py", line 792, in spawn
+        await self._wait_up(spawner)
+      File "/usr/local/lib/python3.8/dist-packages/jupyterhub/user.py", line 836, in _wait_up
+        raise e
+      File "/usr/local/lib/python3.8/dist-packages/jupyterhub/user.py", line 806, in _wait_up
+        resp = await server.wait_up(
+      File "/usr/local/lib/python3.8/dist-packages/jupyterhub/utils.py", line 241, in wait_for_http_server
+        re = await exponential_backoff(
+      File "/usr/local/lib/python3.8/dist-packages/jupyterhub/utils.py", line 189, in exponential_backoff
+        raise asyncio.TimeoutError(fail_message)
+    asyncio.exceptions.TimeoutError: Server at http://192.168.144.4:8888/user/tstreibl/dash-test-dashboard/ didn't respond in 30 seconds
+    
+[D 2021-12-27 21:24:37.639 JupyterHub dockerspawner:982] Getting container 'jupyter-tstreibl-'
+[D 2021-12-27 21:24:37.645 JupyterHub dockerspawner:967] Container a840df8 status: {'Dead': False,
+     'Error': '',
+     'ExitCode': 0,
+     'FinishedAt': '0001-01-01T00:00:00Z',
+     'OOMKilled': False,
+     'Paused': False,
+     'Pid': 197417,
+     'Restarting': False,
+     'Running': True,
+     'StartedAt': '2021-12-27T20:21:37.61964646Z',
+     'Status': 'running'}
+[D 2021-12-27 21:25:07.638 JupyterHub dockerspawner:982] Getting container 'jupyter-tstreibl-'
+[D 2021-12-27 21:25:37.645 JupyterHub dockerspawner:967] Container a840df8 status: {'Dead': False,
+     'Error': '',
+     'ExitCode': 0,
+     'FinishedAt': '0001-01-01T00:00:00Z',
+     'OOMKilled': False,
+     'Paused': False,
+     'Pid': 197417,
+     'Restarting': False,
+     'Running': True,
+     'StartedAt': '2021-12-27T20:21:37.61964646Z',
+     'Status': 'running'}
+[D 2021-12-27 21:25:42.094 JupyterHub proxy:821] Proxy: Fetching GET http://127.0.0.1:8001/api/routes
+21:25:42.100 [ConfigProxy] info: 200 GET /api/routes 
+[D 2021-12-27 21:25:42.111 JupyterHub proxy:346] Checking routes

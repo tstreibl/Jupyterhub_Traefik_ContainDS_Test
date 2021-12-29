@@ -1,0 +1,4 @@
+Entered start.sh with args: python3 -m jhsingle_native_proxy.main --destport=0 python3 {-}m voila {presentation_path} {--}port={port} {--}no-browser {--}Voila.base_url={base_url}/ {--}Voila.server_url=/ --progressive --presentation-path=/home/jovyan/voila_test.ipynb --ip=0.0.0.0 --port=8888 {--}debug --debug
+Granting jovyan passwordless sudo rights!
+Running as jovyan: python3 -m jhsingle_native_proxy.main --destport=0 python3 {-}m voila {presentation_path} {--}port={port} {--}no-browser {--}Voila.base_url={base_url}/ {--}Voila.server_url=/ --progressive --presentation-path=/home/jovyan/voila_test.ipynb --ip=0.0.0.0 --port=8888 {--}debug --debug
+/opt/conda/bin/python3: Error while finding module specification for 'jhsingle_native_proxy.main' (ModuleNotFoundError: No module named 'jhsingle_native_proxy')

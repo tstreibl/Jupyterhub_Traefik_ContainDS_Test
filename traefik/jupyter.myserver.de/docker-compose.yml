@@ -1,0 +1,111 @@
+version: "3.7"
+
+networks:
+  # Enable connection with Traefik 
+  traefik:
+    external: true
+  jupyter_net:  # entspricht ${INTERNAL_NETWORK}
+    name: "jupyter_net"
+    external: false
+    driver: bridge  # ohne den Bridge Mode funktioniert gar nichts
+
+volumes:
+  jupyterhub_data:
+  jupyterhub_config:
+services:
+
+  jupyterhub:
+
+    container_name: jupyterhub
+    
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - jupyterhub_data:/srv/jupyterhub # this volume must be deleted when changing jupyterhub_config.py otherwise changes won't reflect
+      - jupyterhub_config:/etc/jupyterhub # all configurations
+      - "/home/tilo/traefik/letsencrypt/certs/jupyter.tilostreibl.de:/certs:ro"
+    
+   
+    networks:   #von mir
+      - traefik
+      - ${INTERNAL_NETWORK} # - jupyter_net
+     
+    ports:
+      - "8000:8000"
+     # - "8001:8001"
+     # - "8081:8081"
+      - "8888:8888" # necessary?
+     
+    env_file: 
+      - ./.env
+    environment:
+      TZ: Europe/Stockholm #set the time zone in the container     
+     
+      HOST: "${HOST}"   
+      COMPOSE_PROJECT_NAME: "${COMPOSE_PROJECT_NAME}"
+      DOCKER_JUPYTER_CONTAINER: "${DOCKER_JUPYTER_CONTAINER}" #must match the image name build in jupyterlab service
+      DOCKER_NOTEBOOK_DIR: "${DOCKER_NOTEBOOK_DIR}" # directory im Container innerhalb des für jupyterhub generierten binds, wo die jupyter notebooks der User gespeichert werden      
+      #- DOCKER_JUPYTER_CONTAINER=jupyterlab_img
+      HUB_IP: jupyterhub   #must match container_name  (0.0.0.0 does not work)
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${INTERNAL_NETWORK}"
+      - "traefik.frontend.rule=Host:${HOST}" 
+      - "providers.docker=true"
+      
+      # Route HTTPS
+      - "traefik.http.routers.jupyterhub-secure.entrypoints=web-secure"
+      - "traefik.http.routers.jupyterhub-secure.rule=Host(`${HOST}`)"
+      
+      # Enable TLS
+      - "traefik.http.routers.jupyterhub-secure.tls=true"
+      # Enable Let's Encrypt HTTP challenge
+      - "traefik.http.routers.traefik-secure-secured.tls.certresolver=letsencrypthttpchallenge"
+      - "traefik.http.routers.jupyterhub-secure.tls.certresolver=letsencrypthttpchallenge"      
+  
+    image: jupyterhub_img:latest
+    build: 
+      context: ./jupyterhub
+    restart: on-failure
+
+  jupyterlab:
+    container_name: jupyterlab-throaway
+    build: 
+      context: ./jupyterlab    
+    restart: on-failure
+    image: ${DOCKER_JUPYTER_CONTAINER}:latest
+    networks:   
+      - ${INTERNAL_NETWORK}
+    command: echo  # to stop the container being run from docker - the hub will start the container
+    env_file: 
+      - ./.env
+    environment:
+      TZ: Europe/Stockholm #set the time zone in the container
+      DOCKER_NOTEBOOK_DIR: "${DOCKER_NOTEBOOK_DIR}" # directory im Container innerhalb des für jupyterhub generierten binds, wo die jupyter notebooks der User gespeichert werden 
+      GRANT_SUDO: 'yes'
+      CHOWN_HOME: 'yes'
+      CHOWN_HOME_OPTS: '-R'
+      JUPYTERHUB_ANYONE: 1
+      JUPYTER_ENABLE_LAB: 'yes' #see https://github.com/jupyter/docker-stacks/issues/1217
+      NB_GID: 1000 # entspricht Group "users", der default eingerichtete javyan user gehört zu dieser Gruppe
+    labels:     
+      # Connect to Traefik
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:${HOST}" 
+      - "traefik.docker.network= ${INTERNAL_NETWORK}"
+      # Route HTTPS
+      - "traefik.http.routers.jupyterlab-secure.entrypoints=web-secure"
+      - "traefik.http.routers.jupyterlab-secure.rule=Host(`${HOST}`)"
+      # Enable TLS
+      - "traefik.http.routers.jupyterlab-secure.tls=true"
+      # Enable Let's Encrypt HTTP challenge
+      - "traefik.http.routers.jupyterlab-secure.tls.certresolver=letsencrypthttpchallenge"
+      # Enable HSTS headers
+      - "traefik.http.middlewares.hstsheaders.headers.stsSeconds=315360000"
+      - "traefik.http.middlewares.hstsheaders.headers.forceSTSHeader=true"
+      - "traefik.http.middlewares.hstsheaders.headers.stsPreload=true"
+      - "traefik.http.middlewares.hstsheaders.headers.stsIncludeSubdomains=true"
+
+
+
+

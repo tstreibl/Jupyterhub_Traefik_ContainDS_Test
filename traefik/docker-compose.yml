@@ -1,0 +1,99 @@
+version: "3.7"
+
+networks:
+    # Allow back-ends to communicate with this
+    traefik:
+        external: true
+        name: traefik 
+        
+services:
+  traefik:
+    image: "traefik:latest"
+    env_file: 
+      - ./.env
+    container_name: "traefik"
+    restart: always
+    command:
+      # Only if you want to use the Traefik Dashboard
+      - "--log.level=DEBUG"
+      - "--api.insecure=false"  #von mir
+      # von mir
+      - "--api.dashboard=true"
+      # Define Docker as the provider here
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      # The location of where we will store our dynamic file with various configurations possible "on the fly"
+      - "--providers.file.directory=/etc/traefik/dynamic"
+      # Entrypoint -> is a front-end named "web" on HTTP Port 80
+      - "--entrypoints.web.address=:80"
+      # Entrypoint -> is a front-end named "web-secure" on HTTPS Port 443
+      - "--entrypoints.web-secure.address=:443"
+      # HTTP challenge as our method to acquire SSL certificates
+      - "--certificatesresolvers.letsencrypthttpchallenge.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencrypthttpchallenge.acme.httpchallenge.entrypoint=web"
+      # Define Let's Encrypt as the issuer
+      #- "--certificatesresolvers.letsencrypthttpchallenge.acme.email=webmaster@tilostreibl.de"
+      - "--certificatesresolvers.letsencrypthttpchallenge.acme.email=${EMAIL}"
+      # von mir
+      #- "--certificatesresolvers.letsencrypthttpchallenge.acme.onhostrule=true"
+      # Location of the acme.json file
+      - "--certificatesresolvers.letsencrypthttpchallenge.acme.storage=/letsencrypt/acme.json"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:${DOMAIN}"
+      - "traefik.docker.network=traefik"     
+       # This will enable SSL
+      - "traefik.http.routers.traefik-secure.tls=true"
+      # Enable Let's Encrypt HTTP challenge
+      - "traefik.http.routers.traefik-secure.tls.certresolver=letsencrypthttpchallenge"
+      # Use the web-secure as our entrypoint at 443
+      - "traefik.http.routers.traefik-secure.entrypoints=web-secure"
+      # The router here is just called traefik-secure and the FQDN rule
+      - "traefik.http.routers.traefik-secure.rule=Host(`${DASHBOARD}`)"
+      # Enable traefik-auth middleware to use
+      - "traefik.http.routers.traefik-secure.middlewares=traefik-auth"
+      # Refer to traefik's dashboard service
+      - "traefik.http.routers.traefik-secure.service=api@internal"
+      # Hashed Password for the dashboard
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=admin:${ADMIN_PASS}"
+      # Global redirection: http to https
+      - traefik.http.routers.http-catchall.rule=HostRegexp(`{host:(www\.)?.+}`)
+      - traefik.http.routers.http-catchall.entrypoints=web
+      - traefik.http.routers.http-catchall.middlewares=wwwtohttps
+      # Global redirection: https (www.) to https
+      - traefik.http.routers.wwwsecure-catchall.rule=HostRegexp(`{host:(www\.).+}`)
+      - traefik.http.routers.wwwsecure-catchall.entrypoints=web-secure
+      - traefik.http.routers.wwwsecure-catchall.tls=true
+      - traefik.http.routers.wwwsecure-catchall.middlewares=wwwtohttps
+      # middleware: http(s)://(www.) to  https://
+      - traefik.http.middlewares.wwwtohttps.redirectregex.regex=^https?://(?:www\.)?(.+)
+      - traefik.http.middlewares.wwwtohttps.redirectregex.replacement=https://$${1}
+      - traefik.http.middlewares.wwwtohttps.redirectregex.permanent=true
+      
+    # Specifying the Ports Traefik will listen on
+    ports:
+      - "80:80"
+      - "443:443"
+    # The network Traefik will use is just traefik
+    networks:
+      - "traefik"
+    volumes:
+      # Docker socket
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      # Let's Encrypt certificates in ./letsencrypt/acme.json
+      - "./letsencrypt:/letsencrypt"
+      # Mount the dynamic file configuration
+      - ./dynamic-config.yaml:/etc/traefik/dynamic/dynamic-config.yaml
+
+  # wandelt das Letsencrypt Zertifikat von Traefic aus der Datei acme.json in ander Zertifikat Formate im Verzeichnis dump um
+  # wird für jupyter gebraucht, weil man dort keine acme.json einlesen kann, sondern die einzelnen privatekey.key und certificate.crt benötigt
+  # Details: https://github.com/DanielHuisman/traefik-certificate-extractor
+  # Details: https://github.com/ldez/traefik-certs-dumper/issues/46
+  certdumper: 
+    image: ldez/traefik-certs-dumper:latest
+    logging:  #man kann den Log Output nicht konfiguruieren, daher vorerst diese Methode um die Logs der anderen Apps besser zu sehen
+      driver: none
+    command: "file --watch --domain-subdir=true --version v2"
+    volumes:
+      - "./letsencrypt/acme.json:/acme.json:ro"
+      - "./letsencrypt/certs:/dump"
